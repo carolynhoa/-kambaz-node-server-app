@@ -18,9 +18,11 @@ mongoose.connect(CONNECTION_STRING)
 
 const app = express();
 
+const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
+
 app.use(cors({
-  credentials: true,
-  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  origin: clientUrl, 
+  credentials: true, 
 }));
 
 const sessionOptions = {
@@ -35,15 +37,13 @@ const sessionOptions = {
   }
 };
 
+
 if (process.env.SERVER_ENV === "production") { 
-  sessionOptions.proxy = true;
-  sessionOptions.cookie = {
-    sameSite: "none",
-    secure: true,
-    httpOnly: true,
-    domain: process.env.SERVER_URL,
-  };
+  sessionOptions.proxy = true;  
+  sessionOptions.cookie.secure = true;      
+  sessionOptions.cookie.sameSite = "none"; 
 }
+
 
 app.use(session(sessionOptions));
 
