@@ -1,7 +1,8 @@
+import "dotenv/config";
 import express from 'express';
+import mongoose from "mongoose";
 import cors from 'cors';
 import session from "express-session";
-import "dotenv/config";
 import Hello from "./hello.js";
 import Lab5 from "./Lab5/index.js";
 import db from "./Kambaz/Database/index.js";
@@ -10,28 +11,31 @@ import CourseRoutes from "./Kambaz/Courses/routes.js";
 import AssignmentRoutes from "./Kambaz/Assignments/routes.js";
 import ModulesRoutes from "./Kambaz/Modules/routes.js";
 
+const CONNECTION_STRING = process.env.DATABASE_CONNECTION_STRING;
+mongoose.connect(CONNECTION_STRING)
+  .then(() => console.log("Connected to MongoDB Atlas"))
+  .catch(err => console.error("MongoDB connection error:", err));
+
 const app = express();
 
-// 1. CORS first
 app.use(cors({
   credentials: true,
   origin: process.env.CLIENT_URL || "http://localhost:3000",
 }));
 
-// 2. Session configuration
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false,      // false for localhost (no HTTPS)
-    sameSite: 'lax',    // 'lax' for localhost
-    maxAge: 24 * 60 * 60 * 1000  // 24 hours
+    secure: false,      
+    sameSite: 'lax',   
+    maxAge: 24 * 60 * 60 * 1000  
   }
 };
 
-if (process.env.SERVER_ENV === "production") {  // ← Changed to === "production"
+if (process.env.SERVER_ENV === "production") { 
   sessionOptions.proxy = true;
   sessionOptions.cookie = {
     sameSite: "none",
@@ -43,10 +47,8 @@ if (process.env.SERVER_ENV === "production") {  // ← Changed to === "productio
 
 app.use(session(sessionOptions));
 
-// 3. JSON parser
 app.use(express.json());
 
-// 4. Routes
 UserRoutes(app, db);
 CourseRoutes(app, db);
 ModulesRoutes(app, db);
