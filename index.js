@@ -49,6 +49,11 @@ app.use(session(sessionOptions));
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+  next();
+});
+
 UserRoutes(app, db);
 CourseRoutes(app, db);
 ModulesRoutes(app, db);
