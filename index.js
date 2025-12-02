@@ -49,6 +49,7 @@ await mongoose.connect(CONNECTION_STRING);
 console.log("Connected to MongoDB");
 
 const sessionOptions = {
+  name: "kambaz.sid", 
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
@@ -60,7 +61,8 @@ const sessionOptions = {
     httpOnly: true,
     secure: process.env.SERVER_ENV === "production",
     sameSite: process.env.SERVER_ENV === "production" ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/",
   }
 };
 
