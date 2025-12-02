@@ -40,6 +40,11 @@ const sessionOptions = {
   }
 };
 
+app.get("/test-session", (req, res) => {
+  console.log("Session:", req.session);
+  res.json({ session: req.session });
+});
+
 
 if (process.env.SERVER_ENV === "production") { 
   sessionOptions.proxy = true;  
