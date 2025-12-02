@@ -17,24 +17,31 @@ export default function CourseRoutes(app, db) {
 
   const findCoursesForEnrolledUser = async (req, res) => {
     try {
+      console.log("=== FIND COURSES START ===");
+      console.log("1. Session ID:", req.sessionID);
+      console.log("2. Full session:", JSON.stringify(req.session));
+      console.log("3. Headers:", req.headers.cookie);
+      
       let { userId } = req.params;
       if (userId === "current") {
         const currentUser = req.session["currentUser"];
-        console.log("COURSE ROUTE: currentUser =", currentUser);  
+        console.log("4. CurrentUser from session:", currentUser);
+        
         if (!currentUser) {
-          console.log("COURSE ROUTE: No session, returning 401");  
+          console.log("5. NO CURRENT USER - Returning 401");
           return res.sendStatus(401);
         }
         userId = currentUser._id;
       }
       const courses = await enrollmentsDao.findCoursesForUser(userId);
-      console.log("COURSE ROUTE: Found courses =", courses); 
+      console.log("6. Found courses:", courses.length);
       res.json(courses);
     } catch (err) {
-      console.error("COURSE ROUTE ERROR:", err);
+      console.error("ERROR:", err);
       res.status(500).json({ message: "Failed to retrieve enrolled courses" });
     }
   };
+
 
   const createCourse = async (req, res) => {
     try {

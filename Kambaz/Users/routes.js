@@ -5,17 +5,40 @@ export default function UserRoutes(app, db) {
   const dao = UsersDao(db);
   const enrollmentsDao = EnrollmentsDao(db);
 
-  const signin = async (req, res) => {
-    const { username, password } = req.body;
-    const currentUser = await dao.findUserByCredentials(username, password);
-    if (currentUser) {
-      req.session["currentUser"] = currentUser;
-      res.json(currentUser);
-    } else {
-      res.status(401).json({ message: "Unable to login. Try again later." });
-    }
-  };
-
+const signin = async (req, res) => {
+  const { username, password } = req.body;
+  console.log("=== SIGNIN START ===");
+  console.log("1. Username:", username);
+  console.log("2. Session ID before:", req.sessionID);
+  console.log("3. Session before:", JSON.stringify(req.session));
+  
+  const currentUser = await dao.findUserByCredentials(username, password);
+  
+  if (currentUser) {
+    console.log("4. User found:", currentUser.username);
+    req.session["currentUser"] = currentUser;
+    console.log("5. Session after setting user:", JSON.stringify(req.session));
+    
+    await new Promise((resolve, reject) => {
+      req.session.save((err) => {
+        if (err) {
+          console.log("6. ERROR saving session:", err);
+          reject(err);
+        } else {
+          console.log("6. Session saved successfully");
+          console.log("7. Session after save:", JSON.stringify(req.session));
+          resolve();
+        }
+      });
+    });
+    
+    res.json(currentUser);
+  } else {
+    console.log("4. Invalid credentials");
+    res.status(401).json({ message: "Unable to login. Try again later." });
+  }
+  console.log("SIGNIN END");
+};
   const signup = async (req, res) => {
     const user = await dao.findUserByUsername(req.body.username);
     if (user) {
