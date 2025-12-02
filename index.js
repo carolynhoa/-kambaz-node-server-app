@@ -47,6 +47,7 @@ app.get("/test-session", (req, res) => {
 
 
 if (process.env.SERVER_ENV === "production") { 
+  app.set("trust proxy", 1); 
   sessionOptions.proxy = true;  
   sessionOptions.cookie.secure = true;      
   sessionOptions.cookie.sameSite = "none"; 
