@@ -30,13 +30,15 @@ console.log("Allowed origins:", allowedOrigins);
 app.use(cors({
   origin: function(origin, callback) {
     if (!origin) return callback(null, true);
+    if (origin.includes("localhost")) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log("Blocked origin:", origin);
-      callback(new Error('Not allowed by CORS'));
+    if (origin.includes("kambaz-next-js-cs4550-fa25") && origin.includes("vercel.app")) {
+      console.log("Allowed Vercel origin:", origin);
+      return callback(null, true);
     }
+    
+    console.log("BLOCKED origin:", origin);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
 }));
