@@ -69,9 +69,9 @@ export default function UserRoutes(app, db) {
     const userUpdates = req.body;
     await dao.updateUser(userId, userUpdates);
     const currentUser = req.session["currentUser"];
-   if (currentUser && currentUser._id === userId) {
-     req.session["currentUser"] = { ...currentUser, ...userUpdates };
-   }
+    if (currentUser && currentUser._id === userId) {
+      req.session["currentUser"] = { ...currentUser, ...userUpdates };
+    }
     res.json(currentUser);
   };
 
@@ -87,8 +87,13 @@ export default function UserRoutes(app, db) {
       if (!currentUser) return res.sendStatus(401);
       uid = currentUser._id;
     }
-    await enrollmentsDao.enrollUserInCourse(uid, cid);
-    res.sendStatus(200);
+    try {
+      await enrollmentsDao.enrollUserInCourse(uid, cid);
+      res.sendStatus(200);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error enrolling in course" });
+    }
   };
 
   const unenrollFromCourse = async (req, res) => {
@@ -98,8 +103,13 @@ export default function UserRoutes(app, db) {
       if (!currentUser) return res.sendStatus(401);
       uid = currentUser._id;
     }
-    await enrollmentsDao.unenrollUserFromCourse(uid, cid);
-    res.sendStatus(200);
+    try {
+      await enrollmentsDao.unenrollUserFromCourse(uid, cid);
+      res.sendStatus(200);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error unenrolling from course" });
+    }
   };
 
   app.post("/api/users/signin", signin);

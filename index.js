@@ -11,7 +11,10 @@ import CourseRoutes from "./Kambaz/Courses/routes.js";
 import AssignmentRoutes from "./Kambaz/Assignments/routes.js";
 import ModulesRoutes from "./Kambaz/Modules/routes.js";
 
+
 const CONNECTION_STRING = process.env.DATABASE_CONNECTION_STRING;
+console.log("Connection string:", CONNECTION_STRING);  
+
 mongoose.connect(CONNECTION_STRING)
   .then(() => console.log("Connected to MongoDB Atlas"))
   .catch(err => console.error("MongoDB connection error:", err));
