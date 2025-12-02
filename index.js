@@ -40,11 +40,6 @@ const sessionOptions = {
   }
 };
 
-app.get("/test-session", (req, res) => {
-  console.log("Session:", req.session);
-  res.json({ session: req.session });
-});
-
 
 if (process.env.SERVER_ENV === "production") { 
   app.set("trust proxy", 1); 
@@ -57,6 +52,17 @@ if (process.env.SERVER_ENV === "production") {
 app.use(session(sessionOptions));
 
 app.use(express.json());
+
+app.get("/test-session", (req, res) => {
+  console.log("Session ID:", req.sessionID);
+  console.log("Session:", req.session);
+  console.log("Current User:", req.session["currentUser"]);
+  res.json({ 
+    sessionID: req.sessionID,
+    session: req.session,
+    currentUser: req.session["currentUser"]
+  });
+});
 
 UserRoutes(app, db);
 CourseRoutes(app, db);

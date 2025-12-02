@@ -1,9 +1,9 @@
 import CoursesDao from "./dao.js";
 import EnrollmentsDao from "../Enrollments/dao.js";
 
-export default function CourseRoutes(app, db) {  
-  const dao = CoursesDao(db);                     
-  const enrollmentsDao = EnrollmentsDao(db);      
+export default function CourseRoutes(app, db) {
+  const dao = CoursesDao(db);
+  const enrollmentsDao = EnrollmentsDao(db);
 
   const findAllCourses = async (req, res) => {
     try {
@@ -20,15 +20,18 @@ export default function CourseRoutes(app, db) {
       let { userId } = req.params;
       if (userId === "current") {
         const currentUser = req.session["currentUser"];
+        console.log("COURSE ROUTE: currentUser =", currentUser);  
         if (!currentUser) {
+          console.log("COURSE ROUTE: No session, returning 401");  
           return res.sendStatus(401);
         }
         userId = currentUser._id;
       }
       const courses = await enrollmentsDao.findCoursesForUser(userId);
+      console.log("COURSE ROUTE: Found courses =", courses); 
       res.json(courses);
     } catch (err) {
-      console.error(err);
+      console.error("COURSE ROUTE ERROR:", err);
       res.status(500).json({ message: "Failed to retrieve enrolled courses" });
     }
   };
@@ -39,9 +42,7 @@ export default function CourseRoutes(app, db) {
       if (!currentUser) return res.sendStatus(401);
 
       const newCourse = await dao.createCourse(req.body);
-
       await enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
-
       res.json(newCourse);
     } catch (err) {
       console.error(err);
@@ -73,40 +74,21 @@ export default function CourseRoutes(app, db) {
     }
   };
 
-  const enrollUserInCourse = async (req, res) => {
-    let { uid, cid } = req.params;
-    if (uid === "current") {
-      const currentUser = req.session["currentUser"];
-      uid = currentUser._id;
-    }
-    const status = await enrollmentsDao.enrollUserInCourse(uid, cid);
-    res.send(status);
-  };
-  
-  const unenrollUserFromCourse = async (req, res) => {
-    let { uid, cid } = req.params;
-    if (uid === "current") {
-      const currentUser = req.session["currentUser"];
-      uid = currentUser._id;
-    }
-    const status = await enrollmentsDao.unenrollUserFromCourse(uid, cid);
-    res.send(status);
-  };
-
   const findUsersForCourse = async (req, res) => {
-    const { cid } = req.params;
-    const users = await enrollmentsDao.findUsersForCourse(cid);
-    res.json(users);
-  }
-  app.get("/api/courses/:cid/users", findUsersForCourse);
-  
-  app.post("/api/users/:uid/courses/:cid", enrollUserInCourse);
-  app.delete("/api/users/:uid/courses/:cid", unenrollUserFromCourse);
-  
+    try {
+      const { cid } = req.params;
+      const users = await enrollmentsDao.findUsersForCourse(cid);
+      res.json(users);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Failed to retrieve users for course" });
+    }
+  };
 
   app.get("/api/courses", findAllCourses);
   app.post("/api/users/current/courses", createCourse);
   app.get("/api/users/:userId/courses", findCoursesForEnrolledUser);
   app.put("/api/courses/:courseId", updateCourse);
   app.delete("/api/courses/:courseId", deleteCourse);
+  app.get("/api/courses/:cid/users", findUsersForCourse);
 }
