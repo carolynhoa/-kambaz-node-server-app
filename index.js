@@ -37,7 +37,7 @@ app.use(cors({
     if (!origin) return callback(null, true);
     if (origin.includes("localhost")) return callback(null, true);
     
-    if (origin.includes("kambaz-next-js-cs4550-fa25") && origin.includes("vercel.app")) {
+    if (origin.includes("kambaz-next-js-cs4550") && origin.includes("vercel.app")) {
       console.log("Allowed Vercel origin:", origin);
       return callback(null, true);
     }
