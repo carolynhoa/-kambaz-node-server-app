@@ -11,11 +11,6 @@ import UserRoutes from "./Kambaz/Users/routes.js";
 import CourseRoutes from "./Kambaz/Courses/routes.js";
 import AssignmentRoutes from "./Kambaz/Assignments/routes.js";
 import ModulesRoutes from "./Kambaz/Modules/routes.js";
-import QuizRoutes from "./Kambaz/Quizzes/routes.js";
-import QuizAttemptsRoutes from "./Kambaz/QuizAttempts/routes.js";
-import QuestionsRoutes from "./Kambaz/Questions/routes.js";
-
-
 
 const app = express();
 
@@ -84,9 +79,6 @@ UserRoutes(app, db);
 CourseRoutes(app, db);
 ModulesRoutes(app, db);
 AssignmentRoutes(app, db);
-QuizRoutes(app, db); 
-QuizAttemptsRoutes(app, db);
-QuestionsRoutes(app, db);
 Lab5(app);
 Hello(app);
 
